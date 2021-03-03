@@ -115,13 +115,46 @@ void FramePerSecond(auto start,auto end){
     cout<<"FPS= "<< FPS<<endl;
 }
  
-void Steering(int a, int b, int c, int d){
+void _Steering(int a, int b, int c, int d){
   digitalWrite(21, a);
   digitalWrite(22, b);
   digitalWrite(23, c);
   digitalWrite(24, d);
   
   cout<<"Steering =" << 8*d +4*c+2*b+a << endl;
+}
+
+void Steering(int Result)
+{
+	if(Result ==0){ 
+      _Steering(0,0,0,0);  // decimal 0
+      cout<<"Forward"<<endl;
+      }
+    else if( Result > 0 && Result < 10){
+      _Steering(1,0,0,0);  // decimal 1
+      cout<<"Right 1"<<endl;
+    }
+    else if( Result >= 10 && Result < 20){
+      _Steering(0,1,0,0); // decimal 2
+      cout<<"Right 2"<<endl;
+    }
+    else if( Result >= 20 ){
+      _Steering(1,1,0,0);  // decimal 3
+      cout<<"Right 3"<<endl; 
+    } 
+    else if( Result < 0 && Result > -10){
+      _Steering(0,0,1,0);  // decimal 4
+      cout<<"Left 1"<<endl;
+    }
+    else if( Result <= -10 && Result > -20){
+      _Steering(1,0,1,0); // decimal 5
+      cout<<"Left 2"<<endl;
+    }
+    else if( Result <= -20 ){
+      _Steering(0,1,1,0);  // decimal 6
+      cout<<"Left 3"<<endl;
+    }
+
 }
  
  
@@ -150,35 +183,8 @@ int main(int argc, char **argv){
     LaneFinder();
     LaneCenter();
     WriteToFrame();
+    Steering(Result);
   
-    if(Result ==0){ 
-      Steering(0,0,0,0);  // decimal 0
-      cout<<"Forward"<<endl;
-      }
-    else if( Result > 0 && Result < 10){
-      Steering(1,0,0,0);  // decimal 1
-      cout<<"Right 1"<<endl;
-    }
-    else if( Result >= 10 && Result < 20){
-      Steering(0,1,0,0); // decimal 2
-      cout<<"Right 2"<<endl;
-    }
-    else if( Result >= 20 ){
-      Steering(1,1,0,0);  // decimal 3
-      cout<<"Right 3"<<endl; 
-    } 
-    else if( Result < 0 && Result > -10){
-      Steering(0,0,1,0);  // decimal 4
-      cout<<"Left 1"<<endl;
-    }
-    else if( Result <= -10 && Result > -20){
-      Steering(1,0,1,0); // decimal 5
-      cout<<"Left 2"<<endl;
-    }
-    else if( Result <= -20 ){
-      Steering(0,1,1,0);  // decimal 6
-      cout<<"Left 3"<<endl;
-    }
   
     auto end = std::chrono::system_clock::now();
     FramePerSecond(start, end);
