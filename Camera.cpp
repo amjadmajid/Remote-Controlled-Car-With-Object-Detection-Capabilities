@@ -10,43 +10,47 @@ using namespace cv;
 using namespace raspicam;
 
 Mat frame, Matrix, framePers, frameGray, frameThesh, frameEdge, frameFinal;
-Mat frameFinalDuplicate; // `Rect` function draws on the frame. We use this duplicate
-                          // to not distort the frameFinal. See the function `Histogram`.
+Mat frameFinalDuplicate; // `Rect` function draws on the frame. We use this 
+						 // duplicate to not distort the frameFinal. See the 
+						 // function `Histogram`.
 Mat ROILane;
 vector<int> histogramLane;
 
 int LeftLanePos, RightLanePos, Result;
 stringstream ss;
 
-RaspiCam_Cv Camera;  // create an object to access the raspberry pi class functionality
-Point2f Source[] = {Point2f(50,160), Point2f(550,160), Point2f(0,240), Point2f(600,240)};
-Point2f Destination[] = {Point2f(100,0), Point2f(500,0), Point2f(100,240), Point2f(500,240)};
+RaspiCam_Cv Camera;  // create an object to access the raspberry pi class
+
 
 void Setup(int argc, char **argv, RaspiCam_Cv &Camera){
-  Camera.set(CAP_PROP_FRAME_WIDTH, ("-w", argc,argv,600));
-  Camera.set(CAP_PROP_FRAME_HEIGHT, ("-h",argc,argv,240));
-  Camera.set(CAP_PROP_BRIGHTNESS, ("-br",argc,argv,50));
-  Camera.set(CAP_PROP_CONTRAST, ("-co",argc,argv,80));
-  Camera.set(CAP_PROP_SATURATION, ("-sa", argc,argv,50));
-  Camera.set(CAP_PROP_GAIN, ("-g", argc,argv,50));
-  Camera.set(CAP_PROP_FPS, ("-fps", argc, argv,0)); // 0 means the camera will try to capture as many frame per second as possible.
+  Camera.set(CAP_PROP_FRAME_WIDTH, 	("-w", argc,argv,640));
+  Camera.set(CAP_PROP_FRAME_HEIGHT, ("-h",argc,argv, 240));
+  Camera.set(CAP_PROP_BRIGHTNESS, 	("-br",argc,argv,50));
+  Camera.set(CAP_PROP_CONTRAST, 	("-co",argc,argv,80));
+  Camera.set(CAP_PROP_SATURATION, 	("-sa",argc,argv,50));
+  Camera.set(CAP_PROP_GAIN, 		("-g", argc,argv,50));
+  Camera.set(CAP_PROP_FPS, 			("-fps",argc,argv,0)); // 0 means the 
+  //camera will try to capture as many frame per second as possible.
 }
 
 void Capture(){
   Camera.grab();
   Camera.retrieve(frame);
-  // by default opencv processes the images by bgr color space but not in rgb color space
-  cvtColor(frame, frame, COLOR_BGR2RGB); // cvtColor(input, output, -), we are overwriting the frame variable.
-}
+  // opencv default color space is bgr. We convert it to rgb
+  cvtColor(frame, frame, COLOR_BGR2RGB); // cvtColor(input, output, -)
 
 void Perspective(){
-  line(frame,Source[0], Source[1], Scalar(255,0,0));
-  line(frame,Source[1], Source[3], Scalar(0,255,0));
-  line(frame,Source[3], Source[2], Scalar(0,0,255));
-  line(frame,Source[2], Source[0], Scalar(0,0,255));
-  
-  Matrix = getPerspectiveTransform(Source, Destination);
-  warpPerspective(frame, framePers, Matrix, Size(500,240));
+	Point2f Source[] = {Point2f(50,160), Point2f(550,160), Point2f(0,240), 
+						Point2f(600,240)};
+	Point2f Destination[] = {Point2f(100,0), Point2f(500,0), Point2f(100,240), 
+						Point2f(500,240)};
+	line(frame,Source[0], Source[1], Scalar(255,0,0));
+	line(frame,Source[1], Source[3], Scalar(0,255,0));
+	line(frame,Source[3], Source[2], Scalar(0,0,255));
+	line(frame,Source[2], Source[0], Scalar(0,0,255));
+
+	Matrix = getPerspectiveTransform(Source, Destination);
+	warpPerspective(frame, framePers, Matrix, Size(500,240));
 }
 
 void Threshold(){
@@ -167,6 +171,7 @@ int main(int argc, char **argv){
   pinMode(24, OUTPUT);
   
   Setup(argc, argv,Camera);
+
   if(! Camera.open()){  // Camera.open() return 1 if there is a connection to 
                         // the camera
       cout<< "Failed to connect"<<endl;
@@ -184,7 +189,6 @@ int main(int argc, char **argv){
     LaneCenter();
     WriteToFrame();
     Steering(Result);
-  
   
     auto end = std::chrono::system_clock::now();
     FramePerSecond(start, end);
