@@ -23,13 +23,13 @@ RaspiCam_Cv Camera;  // create an object to access the raspberry pi class
 
 
 void Setup(int argc, char **argv, RaspiCam_Cv &Camera){
-  Camera.set(CAP_PROP_FRAME_WIDTH, 	("-w", argc,argv,640));
-  Camera.set(CAP_PROP_FRAME_HEIGHT, ("-h",argc,argv, 240));
+  Camera.set(CAP_PROP_FRAME_WIDTH, 	("-w", argc,argv,480));
+  Camera.set(CAP_PROP_FRAME_HEIGHT, 	("-h",argc,argv, 240));
   Camera.set(CAP_PROP_BRIGHTNESS, 	("-br",argc,argv,50));
   Camera.set(CAP_PROP_CONTRAST, 	("-co",argc,argv,80));
   Camera.set(CAP_PROP_SATURATION, 	("-sa",argc,argv,50));
   Camera.set(CAP_PROP_GAIN, 		("-g", argc,argv,50));
-  Camera.set(CAP_PROP_FPS, 			("-fps",argc,argv,0)); // 0 means the 
+  Camera.set(CAP_PROP_FPS, 		("-fps",argc,argv,0)); // 0 means the 
   //camera will try to capture as many frame per second as possible.
 }
 
@@ -38,19 +38,20 @@ void Capture(){
   Camera.retrieve(frame);
   // opencv default color space is bgr. We convert it to rgb
   cvtColor(frame, frame, COLOR_BGR2RGB); // cvtColor(input, output, -)
+}
 
 void Perspective(){
-	Point2f Source[] = {Point2f(50,160), Point2f(550,160), Point2f(0,240), 
-						Point2f(600,240)};
-	Point2f Destination[] = {Point2f(100,0), Point2f(500,0), Point2f(100,240), 
-						Point2f(500,240)};
+	Point2f Source[] = {Point2f(66,160), Point2f(420,160), Point2f(0,200), 
+						Point2f(480,200)};
+	Point2f Destination[] = {Point2f(100,0), Point2f(280,0), Point2f(100,240), 
+						Point2f(280,240)};
 	line(frame,Source[0], Source[1], Scalar(255,0,0));
 	line(frame,Source[1], Source[3], Scalar(0,255,0));
 	line(frame,Source[3], Source[2], Scalar(0,0,255));
 	line(frame,Source[2], Source[0], Scalar(0,0,255));
 
 	Matrix = getPerspectiveTransform(Source, Destination);
-	warpPerspective(frame, framePers, Matrix, Size(500,240));
+	warpPerspective(frame, framePers, Matrix, Size(400,240));
 }
 
 void Threshold(){
@@ -84,17 +85,17 @@ void LaneFinder(){
   RightPtr = max_element(histogramLane.begin()+250,  histogramLane.end());
   RightLanePos = distance(histogramLane.begin(), RightPtr);
   
-  line(frameFinal, Point2f(LeftLanePos,0), Point2f(LeftLanePos,240), Scalar(0,255,0), 3);
-  line(frameFinal, Point2f(RightLanePos,0), Point2f(RightLanePos,240), Scalar(0,255,0), 3);
+  line(frameFinal, Point2f(LeftLanePos,0), Point2f(LeftLanePos,240), Scalar(0,255,0), 2);
+  line(frameFinal, Point2f(RightLanePos,0), Point2f(RightLanePos,240), Scalar(0,255,0), 2);
 }
 
 void LaneCenter()
 {
   int laneCenter = (LeftLanePos + RightLanePos)/2;
-  line (frameFinal, Point2f(laneCenter, 0), Point2f(laneCenter, 240), Scalar(0,255,0), 3);
+  line (frameFinal, Point2f(laneCenter, 0), Point2f(laneCenter, 240), Scalar(0,255,0), 2);
   
-  int frameCenter = 174;
-  line (frameFinal, Point2f(frameCenter, 0), Point2f(frameCenter, 240), Scalar(0,0,255), 3);
+  int frameCenter = 190;
+  line (frameFinal, Point2f(frameCenter, 0), Point2f(frameCenter, 240), Scalar(0,0,255), 2);
   
   Result = laneCenter - frameCenter;
 }
@@ -135,24 +136,32 @@ void Steering(int Result)
       cout<<"Forward"<<endl;
       }
     else if( Result > 0 && Result < 10){
-      _Steering(1,0,0,0);  // decimal 1
-      cout<<"Right 1"<<endl;
+     // _Steering(1,0,0,0);  // decimal 1
+     //cout<<"Right 1"<<endl;
+     _Steering(0,1,0,0); // decimal 2
+     cout<<"right 2"<<endl;
     }
     else if( Result >= 10 && Result < 20){
-      _Steering(0,1,0,0); // decimal 2
-      cout<<"Right 2"<<endl;
+      //_Steering(0,1,0,0); // decimal 2
+      //cout<<"right 2"<<endl;
+      _Steering(1,1,0,0);  // decimal 3
+      cout<<"Right 3"<<endl; 
     }
     else if( Result >= 20 ){
       _Steering(1,1,0,0);  // decimal 3
       cout<<"Right 3"<<endl; 
     } 
     else if( Result < 0 && Result > -10){
-      _Steering(0,0,1,0);  // decimal 4
-      cout<<"Left 1"<<endl;
-    }
-    else if( Result <= -10 && Result > -20){
+      //_Steering(0,0,1,0);  // decimal 4
+      //cout<<"Left 1"<<endl;
       _Steering(1,0,1,0); // decimal 5
       cout<<"Left 2"<<endl;
+    }
+    else if( Result <= -10 && Result > -20){
+      //_Steering(1,0,1,0); // decimal 5
+      //cout<<"Left 2"<<endl;
+      _Steering(0,1,1,0);  // decimal 6
+      cout<<"Left 3"<<endl;
     }
     else if( Result <= -20 ){
       _Steering(0,1,1,0);  // decimal 6

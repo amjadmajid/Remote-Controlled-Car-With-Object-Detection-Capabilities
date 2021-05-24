@@ -57,7 +57,7 @@ void Perspective()
 void Threshold()
 {
 	cvtColor(framePers, frameGray, COLOR_RGB2GRAY);
-	inRange(frameGray, 200, 255, frameThresh);
+	inRange(frameGray, 240, 255, frameThresh);
 	Canny(frameGray,frameEdge, 900, 900, 3, false);
 	add(frameThresh, frameEdge, frameFinal);
 	cvtColor(frameFinal, frameFinal, COLOR_GRAY2RGB);
