@@ -5,10 +5,11 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
 class Motor():
-	def __init__(self, m1_ena, m1_in1, m1_in2, m2_ena, m2_in1, m2_in2):
+	def __init__(self, m1_ena, m1_in1, m1_in2, m2_in1, m2_in2, m2_ena):
 		self.m1_ena = m1_ena
 		self.m1_in1 = m1_in1
 		self.m1_in2 = m1_in2
+		
 		self.m2_ena = m2_ena
 		self.m2_in1 = m2_in1
 		self.m2_in2 = m2_in2
@@ -16,6 +17,7 @@ class Motor():
 		GPIO.setup(self.m1_ena, GPIO.OUT)
 		GPIO.setup(self.m1_in1, GPIO.OUT)
 		GPIO.setup(self.m1_in2, GPIO.OUT)
+		
 		GPIO.setup(self.m2_ena, GPIO.OUT)
 		GPIO.setup(self.m2_in1, GPIO.OUT)
 		GPIO.setup(self.m2_in2, GPIO.OUT)
@@ -62,10 +64,10 @@ class Motor():
 		sleep(t)
 
 def main():
-	motor1 = Motor(2,3,4, 17,27,22)
+	motor = Motor(12,3,4, 17,27,13)
 
-	motor1.move(0.6,2)
-	motor1.stop(2)
+	motor.move(-0.8,0,1) 
+	motor.stop(2)
 
 if __name__ == '__main__':
 	main()
