@@ -33,14 +33,12 @@ class Motor():
 		trun *=100
 		leftSpeed = speed - trun
 		rightSpeed = speed + trun
-		print(leftSpeed)
-		print(rightSpeed)
+
 		if leftSpeed>100: leftSpeed=100
 		elif leftSpeed<-100:leftSpeed=-100
 		if rightSpeed>100: rightSpeed=100
 		elif rightSpeed<-100: rightSpeed=-100
-		print(leftSpeed)
-		print(rightSpeed)
+
 		self.m1_pwm.ChangeDutyCycle(abs(leftSpeed))
 		self.m2_pwm.ChangeDutyCycle(abs(rightSpeed))
 		if leftSpeed>0: 
