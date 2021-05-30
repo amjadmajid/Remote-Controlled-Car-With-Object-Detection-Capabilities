@@ -1,10 +1,12 @@
 from MotorModule import Motor
 import KeyPressModule as kp
 import JoystickModule as js
-from time import sleep
+import time
 import cv2
 from CameraModule import *
 from datetime import datetime, timedelta
+from picamera import PiCamera
+from picamera.array import PiRGBArray
 
 ##############################
 motor = Motor(12,5,6, 22,27,13)
@@ -15,45 +17,48 @@ movement = 'Joystick'
 
 def move():
     if movement == 'Joystick':
-    jsVal = js.getJS()
-    #print(jsVal)
-    motor.move(-jsVal['axis2'],jsVal['axis1'],0.1)
-    sleep(.05)
-else:
-    if kp.getKey('UP'):
-        motor.move(0.8,0,.1)
-    elif kp.getKey('DOWN'):
-        motor.move(-0.8,0,.1) 
-    elif kp.getKey('LEFT'):
-        motor.move(0.5,0.6,.1) 
-    elif kp.getKey('RIGHT'):
-        motor.move(0.5,-0.6,.1) 
+        jsVal = js.getJS()
+        #print(jsVal)
+        motor.move(-jsVal['axis2'],jsVal['axis1'],0.1)
+        time.sleep(.05)
     else:
-        motor.stop(.1)
-
+        if kp.getKey('UP'):
+            motor.move(0.8,0,.1)
+        elif kp.getKey('DOWN'):
+            motor.move(-0.8,0,.1) 
+        elif kp.getKey('LEFT'):
+            motor.move(0.5,0.6,.1) 
+        elif kp.getKey('RIGHT'):
+            motor.move(0.5,-0.6,.1) 
+        else:
+            motor.stop(.1)
+key = None
 captureFlag = True
+captureTime = 0
 def photoCaptureTime(frame, rawCapture):
+    global captureFlag, key, captureTime
     if captureFlag == True:
-        captureTime = datetime.now() + timedelta(seconds=1)
+        captureTime = datetime.now() + timedelta(seconds=0.5)
         captureFlag = False
         img = frame.array
         #display the image using OpenCV `imshow` method
         objInfo = getObject(img)
         cv2.imshow("Image", img)
         key = cv2.waitKey(1) & 0xff
-        rawCapture.truncate(0)
-    if captureTime <= datetime.now():
+        
+    elif captureTime <= datetime.now():
         captureFlag=True
+    rawCapture.truncate(0)
 
 
 
 def main():
-
+    global key
     #initialize the camera and get a reference to the raw camera capture
     cam  = PiCamera()
-    cam.resolution=(320,320)
+    cam.resolution=(640,480)
     cam.framerate=1
-    rawCapture = PiRGBArray(cam, size=(320,320))
+    rawCapture = PiRGBArray(cam, size=(640,480))
 
     # allow the camera to warmup
     time.sleep(0.1)
@@ -66,6 +71,4 @@ def main():
     
         
 if __name__ == '__main__':
-    cap = cv2.VideoCapture(0)
-    while True:
-        main()
+    main()
