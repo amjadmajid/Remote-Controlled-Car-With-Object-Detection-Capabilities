@@ -32,43 +32,34 @@ def move():
             motor.move(0.5,-0.6,.1) 
         else:
             motor.stop(.1)
-key = None
-captureFlag = True
+
 captureTime = 0
-def photoCaptureTime(frame, rawCapture):
-    global captureFlag, key, captureTime
-    if captureFlag == True:
-        captureTime = datetime.now() + timedelta(seconds=0.5)
-        captureFlag = False
-        img = frame.array
-        #display the image using OpenCV `imshow` method
-        objInfo = getObject(img)
-        cv2.imshow("Image", img)
-        key = cv2.waitKey(1) & 0xff
-        
-    elif captureTime <= datetime.now():
-        captureFlag=True
-    rawCapture.truncate(0)
+def photoCaptureTime(timeInterval):
+    global captureTime
+    if captureTime <= datetime.now():
+        captureTime = datetime.now() + timedelta(seconds=timeInterval)
+        return True
+
+    return False
+
+
 
 
 
 def main():
-    global key
-    #initialize the camera and get a reference to the raw camera capture
-    cam  = PiCamera()
-    cam.resolution=(640,480)
-    cam.framerate=1
-    rawCapture = PiRGBArray(cam, size=(640,480))
+    move()
+    if photoCaptureTime(0.5):
+        success, img = cap.read()
+        objInfo = getObject(img, targets=['person'])
+        print(objInfo)
+        cv2.imshow("Output", img)
 
-    # allow the camera to warmup
-    time.sleep(0.1)
-    for frame in cam.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-        move()
-        photoCaptureTime(frame, rawCapture)
-        #keep the image on screen until a key is pressed 
-        if key == ord("q"):
-            break
+    key = cv2.waitKey(1) & 0xff
+    if key == ord("q"):
+        break
     
         
 if __name__ == '__main__':
-    main()
+    cap = cv2.VideoCapture(0)
+    while True:
+        main()
