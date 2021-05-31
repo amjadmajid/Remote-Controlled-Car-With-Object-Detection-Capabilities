@@ -48,18 +48,18 @@ def photoCaptureTime(timeInterval):
 
 def main():
     move()
-    if photoCaptureTime(0.5):
-        success, img = cap.read()
-        objInfo = getObject(img, targets=['person'])
-        print(objInfo)
-        cv2.imshow("Output", img)
+    #if photoCaptureTime(0.5):
+        #success, img = cap.read()
+        #objInfo = getObject(img, targets=['person'])
+        #print(objInfo)
+        #cv2.imshow("Output", img)
 
-    key = cv2.waitKey(1) & 0xff
-    if key == ord("q"):
-        break
+    #key = cv2.waitKey(1) & 0xff
+    #if key == ord("q"):
+        #break
     
         
 if __name__ == '__main__':
-    cap = cv2.VideoCapture(0)
+    #cap = cv2.VideoCapture(0)
     while True:
         main()
