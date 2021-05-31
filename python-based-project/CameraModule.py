@@ -29,7 +29,7 @@ def getObject(img, draw=True, targets=[]):
                 #print("classId=",classId, "classNames Len=", len(classNames))
                 className=classNames[classId-1]
                 if className in targets:
-                    objectInfo.append( (className,confidence,box))
+                    objectInfo.append((className,confidence,box))
                     if (draw):
                         cv2.rectangle(img, box, color=(0,255,0), thickness=2)
                         if classId > 0:

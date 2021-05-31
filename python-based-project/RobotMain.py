@@ -36,7 +36,7 @@ def move():
         else:
             motor.stop(.1)
 
-captureTime = 0
+captureTime = datetime.now() - timedelta(seconds=1)
 def photoCaptureTime(timeInterval):
     global captureTime
     if captureTime <= datetime.now():
@@ -52,12 +52,15 @@ def photoCaptureTime(timeInterval):
 def main():
     move()
     # reading images from the camera thread
-    frame = vs.read()
-    frame = imutils.resize(frame, width=400)
-    objInfo = getObject(frame, targets=['person'])
-    print(objInfo)
-    cv2.imshow("Frame", frame)
-    fps.update()
+    if photoCaptureTime(5):
+        frame = vs.read()
+        frame = imutils.resize(frame, width=400)
+        objInfo = getObject(frame, draw=False, targets=['person'])
+        if len(objInfo):
+            print(objInfo[0][0])
+        #cv2.imshow("Frame", frame)
+        key = cv2.waitKey(1) & 0xFF
+        fps.update()
 
     #if photoCaptureTime(0.5):
         #success, img = cap.read()
