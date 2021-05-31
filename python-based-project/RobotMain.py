@@ -7,6 +7,9 @@ from CameraModule import *
 from datetime import datetime, timedelta
 from picamera import PiCamera
 from picamera.array import PiRGBArray
+import imutils 
+from imutils.video.pivideostream import PiVideoStream
+from imutils.video import FPS
 
 ##############################
 motor = Motor(12,5,6, 22,27,13)
@@ -48,6 +51,14 @@ def photoCaptureTime(timeInterval):
 
 def main():
     move()
+    # reading images from the camera thread
+    frame = vs.read()
+    frame = imutils.resize(frame, width=400)
+    objInfo = getObject(frame, targets=['person'])
+    print(objInfo)
+    cv2.imshow("Frame", frame)
+    fps.update()
+
     #if photoCaptureTime(0.5):
         #success, img = cap.read()
         #objInfo = getObject(img, targets=['person'])
@@ -61,5 +72,11 @@ def main():
         
 if __name__ == '__main__':
     #cap = cv2.VideoCapture(0)
+    vs = PiVideoStream().start()
+    time.sleep(2.0)
+    fps = FPS().start()
     while True:
         main()
+    fps.stop()
+    cv2.destroyAllWindows()
+    vs.stop()
