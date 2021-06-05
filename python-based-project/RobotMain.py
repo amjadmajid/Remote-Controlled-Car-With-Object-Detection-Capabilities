@@ -5,11 +5,8 @@ import time
 import cv2
 from CameraModule import *
 from datetime import datetime, timedelta
-from picamera import PiCamera
-from picamera.array import PiRGBArray
-import imutils 
-from imutils.video.pivideostream import PiVideoStream
-from imutils.video import FPS
+from multiprocessing  import Process
+
 
 ##############################
 motor = Motor(12,5,6, 22,27,13)
@@ -46,40 +43,28 @@ def photoCaptureTime(timeInterval):
     return False
 
 
-
-
-
 def main():
-    move()
-    # reading images from the camera thread
-    if photoCaptureTime(5):
-        frame = vs.read()
-        frame = imutils.resize(frame, width=400)
-        objInfo = getObject(frame, draw=False, targets=['person'])
-        if len(objInfo):
-            print(objInfo[0][0])
-        #cv2.imshow("Frame", frame)
-        key = cv2.waitKey(1) & 0xFF
-        fps.update()
+    process = Process(target=getObject)
+    process.start()
+    while True: 
+        move()
+        # reading images from the camera thread
+        #if photoCaptureTime(1):
 
-    #if photoCaptureTime(0.5):
-        #success, img = cap.read()
-        #objInfo = getObject(img, targets=['person'])
-        #print(objInfo)
-        #cv2.imshow("Output", img)
 
-    #key = cv2.waitKey(1) & 0xff
-    #if key == ord("q"):
-        #break
-    
+        #if photoCaptureTime(0.5):
+            #success, img = cap.read()
+            #objInfo = getObject(img, targets=['person'])
+            #print(objInfo)
+            #cv2.imshow("Output", img)
+
+        #key = cv2.waitKey(1) & 0xff
+        #if key == ord("q"):
+            #break
+        
         
 if __name__ == '__main__':
     #cap = cv2.VideoCapture(0)
-    vs = PiVideoStream().start()
-    time.sleep(2.0)
-    fps = FPS().start()
-    while True:
-        main()
-    fps.stop()
-    cv2.destroyAllWindows()
-    vs.stop()
+    main()
+    detectionCleanup()
+    
