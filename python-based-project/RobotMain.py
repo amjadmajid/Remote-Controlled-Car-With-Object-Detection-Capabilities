@@ -44,23 +44,12 @@ def photoCaptureTime(timeInterval):
 
 
 def main():
-    process = Process(target=getObject)
+    objDetect = ObjectDetect()
+    process = Process(target=objDetect.getObject)
     process.start()
     while True: 
         move()
-        # reading images from the camera thread
-        #if photoCaptureTime(1):
 
-
-        #if photoCaptureTime(0.5):
-            #success, img = cap.read()
-            #objInfo = getObject(img, targets=['person'])
-            #print(objInfo)
-            #cv2.imshow("Output", img)
-
-        #key = cv2.waitKey(1) & 0xff
-        #if key == ord("q"):
-            #break
         
         
 if __name__ == '__main__':
