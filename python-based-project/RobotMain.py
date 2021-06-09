@@ -5,15 +5,12 @@ import time
 import cv2
 from CameraModule import *
 from datetime import datetime, timedelta
-from multiprocessing  import Process
 
 
 ##############################
 motor = Motor(12,5,6, 22,27,13)
 movement = 'Joystick' 
 ##############################
-
-#kp.init()
 
 def move():
     if movement == 'Joystick':
@@ -39,21 +36,17 @@ def photoCaptureTime(timeInterval):
     if captureTime <= datetime.now():
         captureTime = datetime.now() + timedelta(seconds=timeInterval)
         return True
-
     return False
 
-
 def main():
-    objDetect = ObjectDetect()
-    process = Process(target=objDetect.getObject)
-    process.start()
     while True: 
         move()
 
         
-        
 if __name__ == '__main__':
-    #cap = cv2.VideoCapture(0)
+    objDetect = ObjectDetect()
+    process = Process(target=objDetect.getObject)
+    process.start()
     main()
-    detectionCleanup()
+
     

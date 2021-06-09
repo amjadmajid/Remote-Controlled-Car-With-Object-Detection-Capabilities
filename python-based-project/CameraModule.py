@@ -5,12 +5,19 @@ from picamera.array import PiRGBArray
 import imutils 
 from imutils.video import FPS
 from imutils.video.pivideostream import PiVideoStream
+from multiprocessing  import Process
 
+def callObjDetectProcess():
+    objDetect = ObjectDetect()
+    process = Process(target=objDetect.getObject)
+    process.start()
 
 class ObjectDetect():
     def __init__(self, resolution=(320,240), framerate=32, draw=True, targets=['person']):
         print("objectDetect")
 
+        self.targets = targets
+        self.draw = draw
         self.classNames = []
         classFile = '/home/pi/Desktop/self-driving/python-based-project/ObjectDetection/coco.names'
         with open (classFile, 'rt') as f:
@@ -34,25 +41,24 @@ class ObjectDetect():
         cv2.destroyAllWindows()
         self.vs.stop()
         
-    def getObject():
+    def getObject(self):
 
         while True:
             frame = self.vs.read()
             frame = imutils.resize(frame)
-            
-            classIds, confs, bbox = net.detect(frame, confThreshold=0.7, nmsThreshold=.2)
+            print("reading new frame") 
+            classIds, confs, bbox = self.net.detect(frame, confThreshold=0.7, nmsThreshold=.2)
             objectInfo=[]
             className=None
-            userDefCalsses=False
-            if len(targets)==0: targets=classNames
+            if len(self.targets)==0: self.targets=classNames
 
             if len(classIds) !=0:
                 for classId, confidence, box in zip(classIds.flatten(), confs.flatten(), bbox):
                         #print("classId=",classId, "classNames Len=", len(classNames))
-                        className=classNames[classId-1]
-                        if className in targets:
+                        className=self.classNames[classId-1]
+                        if className in self.targets:
                             objectInfo.append((className,confidence,box))
-                            if (draw):
+                            if (self.draw):
                                 cv2.rectangle(frame, box, color=(0,255,0), thickness=2)
                                 if classId > 0:
                                     cv2.putText(frame, className.upper(), (box[0]+10, box[1]+30),
@@ -61,11 +67,13 @@ class ObjectDetect():
                                                 cv2.FONT_HERSHEY_COMPLEX,1,(255,0,0),2)
             cv2.imshow("Frame", frame)
             key = cv2.waitKey(1) & 0xFF
-            fps.update()
+            self.fps.update()
+            
             print(objectInfo)
 
 if __name__ == "__main__":
     objDetect = ObjectDetect()
     while True:
-        getObject.objDetect()
+        objDetect.getObject()
+    objDetect.detectionCleanup(self)
 
