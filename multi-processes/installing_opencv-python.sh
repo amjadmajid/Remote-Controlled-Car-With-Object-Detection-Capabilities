@@ -1,3 +1,4 @@
+!# /usr/bin/basn
 
 sudo apt-get purge wolfram-engine
 sudo apt-get purge libreoffice*

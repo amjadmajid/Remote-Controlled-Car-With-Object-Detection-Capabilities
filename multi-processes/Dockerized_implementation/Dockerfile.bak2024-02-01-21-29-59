@@ -1,0 +1,32 @@
+# Use an official Python runtime as a parent image, adjusted for Raspberry Pi's ARM64 architecture
+FROM python:3.8-slim
+
+# Install system dependencies required for general development and OpenCV
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libopencv-dev \
+    gcc \
+    g++ \
+    libffi-dev \
+    libjpeg-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Copy the current directory contents into the container at /usr/src/app
+COPY . .
+
+# Install Python dependencies, prefer binary packages to avoid compilation
+RUN pip install --upgrade pip setuptools wheel &&\
+    pip install -r requirements.txt
+
+# Make port 5000 available to the world outside this container
+EXPOSE 5000
+
+# Define environment variable
+ENV FLASK_APP=CameraFeed.py
+
+# Run app.py when the container launches
+CMD ["flask", "run", "--host=0.0.0.0"]
+

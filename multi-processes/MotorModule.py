@@ -28,7 +28,7 @@ class Motor():
 		self.m2_pwm.start(0)
 
 
-	def move(self, speed=0.5, trun=0, t=0):
+	def move(self, speed=1, trun=0, t=0):
 		speed *=100
 		trun *=100
 		leftSpeed = speed - trun
@@ -38,9 +38,13 @@ class Motor():
 		elif leftSpeed<-100:leftSpeed=-100
 		if rightSpeed>100: rightSpeed=100
 		elif rightSpeed<-100: rightSpeed=-100
+		
+		print(abs(leftSpeed), abs(rightSpeed))
+
 
 		self.m1_pwm.ChangeDutyCycle(abs(leftSpeed))
 		self.m2_pwm.ChangeDutyCycle(abs(rightSpeed))
+		
 		if leftSpeed>0: 
 			GPIO.output(self.m1_in1, GPIO.LOW)
 			GPIO.output(self.m1_in2, GPIO.HIGH)
@@ -54,16 +58,21 @@ class Motor():
 		else:
 			GPIO.output(self.m2_in1, GPIO.HIGH)
 			GPIO.output(self.m2_in2, GPIO.LOW)
+			
 		sleep(t)
 
 	def stop(self, t=0):
+		GPIO.output(self.m1_in1, GPIO.LOW)
+		GPIO.output(self.m1_in2, GPIO.LOW)
+		GPIO.output(self.m2_in1, GPIO.LOW)
+		GPIO.output(self.m2_in2, GPIO.LOW)
 		self.m1_pwm.ChangeDutyCycle(0)
 		self.m2_pwm.ChangeDutyCycle(0)
 		sleep(t)
 
 def main():
-	motor = Motor(12,3,4, 17,27,13)
-
+	motor = Motor(13,5,6, 17, 27,12) #Motor(12,3,4, 17,27,13)
+	
 	motor.move(-0.8,0,1) 
 	motor.stop(2)
 

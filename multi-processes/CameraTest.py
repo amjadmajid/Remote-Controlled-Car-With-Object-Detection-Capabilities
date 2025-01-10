@@ -1,16 +1,24 @@
 import cv2
-frameWidth = 640
-frameHeight = 480
-cap = cv2.VideoCapture(0)
-cap.set(3, frameWidth)
-cap.set(4, frameHeight)
+
+# Define GStreamer pipeline string
+gst_pipeline = 'libcamerasrc ! video/x-raw,format=BGR,width=640,height=480,framerate=30/1 ! videoconvert ! appsink'
+
+cap = cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
+if not cap.isOpened():
+    print("Failed to open camera")
+    exit()
+
 while True:
-	success, img = cap.read()
-	if success:
-		cv2.imshow("Result", img)
-	if cv2.waitKey(1) & 0xff == ord('q'):
-		break
+    ret, frame = cap.read()
+    if not ret:
+        print("Failed to get frame")
+        break
+
+    cv2.imshow('Camera', frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
 cap.release()
 cv2.destroyAllWindows()
+
 
